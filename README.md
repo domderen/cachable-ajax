@@ -17,3 +17,8 @@ core-ajax and it's usual response.
 If user will start the ajax request for the first time, he/she should get just one callback of 
 core-response handler. On any consecutive same ajax request, data will be taken from cache,
 before returning the value from server (core-response event callback will fire twice).
+
+## Installation
+
+Install the package
+`bower install cachable-ajax --save`
