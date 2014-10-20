@@ -1,0 +1,19 @@
+{
+  "name": "cachable-ajax",
+  "version": "0.0.0",
+  "keywords": [
+    "seed",
+    "polymer",
+    "web-components"
+  ],
+  "main": "cachable-ajax.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^0.4.0",
+    "core-ajax": "Polymer/core-ajax#~0.4.2",
+    "core-localstorage": "Polymer/core-localstorage#~0.4.2",
+    "js-md5": "~1.1.0"
+  },
+  "devDependencies": {
+    "polymer-test-tools": "Polymer/polymer-test-tools#^0.4.0"
+  }
+}

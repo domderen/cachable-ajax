@@ -1,0 +1,98 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../core-ajax/core-ajax.html">
+<link rel="import" href="../core-localstorage/core-localstorage.html">
+
+<script src="../js-md5/js/md5.min.js"></script>
+
+<!--
+A connection point between core-ajax component and core-localstorage, where 
+the content downloaded from the server, can be cached on the localstorage, if that is the wish of the user.
+This element extends the core-ajax element exposing the same interface (events and attributes).
+Value is cached in the local storage as the MD5 hash from the url + params (stringified) + handleAs.
+If some value is found in cache, it is returned to through the core-response event. The detail.response
+property will contain the object returned from cache. It is the same property as in case of 
+core-ajax and it's usual response.
+
+If user will start the ajax request for the first time, he/she should get just one callback of 
+core-response handler. On any consecutive same ajax request, data will be taken from cache,
+before returning the value from server (core-response event callback will fire twice).
+
+##### Example
+
+    <cachable-ajax
+    auto
+    url="http://gdata.youtube.com/feeds/api/videos/"
+    params='{"alt":"json", "q":"chrome"}'
+    handleAs="json"
+    on-core-response="{{handleResponse}}"
+    cacheResponse="true"></cachable-ajax>
+
+@element cachable-ajax
+@blurb A connection point between core-ajax component and core-localstorage.
+@homepage http://polymerlabs.github.io/cachable-ajax
+-->
+<polymer-element name="cachable-ajax" hidden extends="core-ajax" attributes="cacheResponse">
+    <script>
+
+        Polymer({
+            /**
+             * Fired when a response is received. In cached content is found, this event will be fired twice.
+             *
+             * @event cachable-response
+             */
+
+            /**
+             * Fired when an error is received.
+             *
+             * @event core-error
+             */
+
+            /**
+             * Fired whenever a response or an error is received.
+             *
+             * @event core-complete
+             */
+
+            /**
+           * `cacheResponse` is a property defining if the ajax response should be cached uzing the local storage.
+           *
+           * @property cacheResponse
+           * @type bool
+           * @default true
+           */
+            cacheResponse: true,
+
+            ready: function() {
+                var that = this;
+            
+                this.super();
+                this.store = document.createElement('core-localstorage');
+                this.store.useRaw = false;
+                this.store.autoSaveDisabled = true;
+                this.store.addEventListener('core-localstorage-load', function (e) {
+                    that.fire('core-response', {response: that.store.value});
+                });
+            },
+            go: function () {
+                if(this.cacheResponse) {
+                    var paramsString = JSON.stringify(this.params);
+                    var valueToHash = this.url + paramsString + this.handleAs;
+                    this.store.name = md5(valueToHash);
+                    this.store.load();    
+                }
+                
+                this.super();
+            },
+            processResponse: function (xhr) {
+                this.super([xhr]);
+                
+                if(this.cacheResponse && this.store.name) {
+                    this.store.value = this.response;
+                    this.store.save();    
+                }
+            }
+        });
+
+    </script>
+
+</polymer-element>
