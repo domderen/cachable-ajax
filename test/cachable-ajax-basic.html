@@ -14,29 +14,28 @@
 </head>
 <body>
 
-  <cachable-ajax></cachable-ajax>
+    <cachable-ajax auto url="//gdata.youtube.com/feeds/api/videos/" 
+                       params='{"alt":"json", "q":"chrome"}'
+                       handleAs="json"></cachable-ajax>
 
   <script>
+      var expected = 2;
 
+      function checkDone() {
+          expected--;
+          if (expected === 0) {
+              done();
+          }
+      }
+      
     document.addEventListener('polymer-ready', function() {
-      // Test a property
       var myEl = document.querySelector('cachable-ajax');
-      assert.equal(myEl.author, 'Dimitri Glazkov');
-
-      // Test a method
-      var hello = myEl.sayHello();
-      assert.equal(hello, 'cachable-ajax says, Hello World!');
-      var greetings = myEl.sayHello('greetings Earthlings');
-      assert.equal(greetings, 'cachable-ajax says, greetings Earthlings');
+      assert.equal(myEl.cacheResponse, true);
 
       // Test an event
-      myEl.addEventListener('cachable-ajax-lasers-success', function(event) {
-        assert.equal(event.detail.sound, 'Pew pew pew!');
-        // IMPORTANT:
-        // Make sure to call done() at the end of every test suite!
-        done();
+        myEl.addEventListener('core-response', function(event) {
+            checkDone();
       });
-      myEl.fireLasers();
     });
 
   </script>
