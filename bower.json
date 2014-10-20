@@ -1,10 +1,13 @@
 {
   "name": "cachable-ajax",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "keywords": [
     "seed",
     "polymer",
-    "web-components"
+    "web-components",
+      "cache",
+      "local-storage",
+      "ajax"
   ],
   "main": "cachable-ajax.html",
   "dependencies": {
