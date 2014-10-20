@@ -1,7 +1,8 @@
 cachable-ajax
 ================
+This element extends core-ajax element. It exposes the same API (docs: https://www.polymer-project.org/docs/elements/core-elements.html#core-ajax).
 
-See the [component page](http://domderen.github.io/cachable-ajax) for more information.
+See the [component page](http://domderen.github.io/components/cachable-ajax) for more information.
 
 ## Getting Started
 
