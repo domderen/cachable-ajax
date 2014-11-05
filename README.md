@@ -54,6 +54,7 @@ key="localStorageKey"></cachable-ajax>`
 *0.2.1*
 - Added new parameter 'key', for defining custom cache key.
 - Added calculation of generated cache key, based on the xhrArgs object of the request. Basically now component calculated md5 cache of the request.
+
 *0.1.1*
 - Added basic version of the component, being able to cache responses to localstorage.
 
