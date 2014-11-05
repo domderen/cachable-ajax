@@ -10,24 +10,55 @@
     </head>
     <body unresolved>
 
-        <cachable-ajax auto url="//gdata.youtube.com/feeds/api/videos/" 
-                        params='{"alt":"json", "q":"chrome"}'
-                        handleAs="json"></cachable-ajax>
+        <cachable-ajax
+            auto
+            url="http://gdata.youtube.com/feeds/api/videos/"
+            params='{"alt":"json", "q":"chrome"}'
+            handleAs="json"
+            id="example1"
+            cacheResponse="false"></cachable-ajax>
+        
+        <cachable-ajax
+            auto
+            url="http://gdata.youtube.com/feeds/api/videos/"
+            params='{"alt":"json", "q":"chrome"}'
+            handleAs="json"
+            id="example2"
+            cacheResponse="true"></cachable-ajax>
 
-        <template repeat="{{response.feed.entry}}">
-            <div>{{title.$t}}</div>
-        </template>
+        <cachable-ajax
+            auto
+            url="http://gdata.youtube.com/feeds/api/videos/"
+            params='{"alt":"json", "q":"chrome"}'
+            handleAs="json"
+            id="example3"
+            cacheResponse="true"
+            key="localStorageKey"></cachable-ajax>
 
+        <h3>Example 1 Response</h3>
+        <div id="example1Response"></div>
+
+        <h3>Example 2 Response</h3>
+        <div id="example2Response"></div>
+
+        <h3>Example 3 Response</h3>
+        <div id="example3Response"></div>
         <script>
             document.addEventListener('polymer-ready', function() {
-                var ajax = document.querySelector("cachable-ajax");
-                ajax.addEventListener("core-response", 
-                                      function(e) {
-                    document.querySelector('template').model = {
-                        response: e.detail.response
-                    };
-                }
-                                     );
+                var ajax = document.querySelector("#example1");
+                ajax.addEventListener("core-response", function(e) {
+                    document.querySelector('#example1Response').innerText = e.detail.response;
+                });
+
+                var ajax2 = document.querySelector("#example2");
+                ajax2.addEventListener("core-response", function(e) {
+                    document.querySelector('#example2Response').innerText = e.detail.response;
+                });
+
+                var ajax3 = document.querySelector("#example3");
+                ajax3.addEventListener("core-response", function(e) {
+                    document.querySelector('#example3Response').innerText = e.detail.response;
+                });
             });
         </script>
 

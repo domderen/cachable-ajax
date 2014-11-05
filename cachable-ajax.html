@@ -7,27 +7,28 @@
 <!--
 This element extends core-ajax element. It exposes the same API (docs: https://www.polymer-project.org/docs/elements/core-elements.html#core-ajax).
 
-A connection point between core-ajax component and core-localstorage, where 
+A connection point between core-ajax component and core-localstorage, where
 the content downloaded from the server, can be cached on the localstorage, if that is the wish of the user.
 This element extends the core-ajax element exposing the same interface (events and attributes).
-Value is cached in the local storage as the MD5 hash from the url + params (stringified) + handleAs.
+Value is cached in the local storage as the MD5 hash from the xhrArgs object (request object).
 If some value is found in cache, it is returned to through the core-response event. The detail.response
-property will contain the object returned from cache. It is the same property as in case of 
+property will contain the object returned from cache. It is the same property as in case of
 core-ajax and it's usual response.
 
-If user will start the ajax request for the first time, he/she should get just one callback of 
+If user will start the ajax request for the first time, he/she should get just one callback of
 core-response handler. On any consecutive same ajax request, data will be taken from cache,
 before returning the value from server (core-response event callback will fire twice).
 
 ##### Example
 
-    <cachable-ajax
-    auto
-    url="http://gdata.youtube.com/feeds/api/videos/"
-    params='{"alt":"json", "q":"chrome"}'
-    handleAs="json"
-    on-core-response="{{handleResponse}}"
-    cacheResponse="true"></cachable-ajax>
+<cachable-ajax
+auto
+url="http://gdata.youtube.com/feeds/api/videos/"
+params='{"alt":"json", "q":"chrome"}'
+handleAs="json"
+on-core-response="{{handleResponse}}"
+cacheResponse="true"
+key="localStorageKey"></cachable-ajax>
 
 @element cachable-ajax
 @blurb A connection point between core-ajax component and core-localstorage.
@@ -56,7 +57,7 @@ before returning the value from server (core-response event callback will fire t
              */
 
             /**
-           * `cacheResponse` is a property defining if the ajax response should be cached uzing the local storage.
+           * `cacheResponse` is a property defining if the ajax response should be cached using the local storage.
            *
            * @property cacheResponse
            * @type bool
@@ -64,33 +65,56 @@ before returning the value from server (core-response event callback will fire t
            */
             cacheResponse: true,
 
+            /**
+           * `storageKey` is a property defining the key to use in communication with local storage.
+           * If the value is falsy, storage key will be generated based on the request parameters.
+           *
+           * @property storageKey
+           * @type string
+           * @default undefined
+           */
+            storageKey: undefined,
+
             ready: function() {
                 var that = this;
-            
+
                 this.super();
                 this.store = document.createElement('core-localstorage');
                 this.store.useRaw = false;
                 this.store.autoSaveDisabled = true;
-                this.store.addEventListener('core-localstorage-load', function (e) {
+                this.store.addEventListener('core-localstorage-load', function () {
                     that.fire('core-response', {response: that.store.value});
                 });
             },
+
+            /**
+             * Performs an Ajax request to the specified URL. If cacheResponse is set to true,
+             * it also tries to load the value for this request from the localstorage.
+             *
+             * @method go
+             */
             go: function () {
-                if(this.cacheResponse) {
-                    var paramsString = JSON.stringify(this.params);
-                    var valueToHash = this.url + paramsString + this.handleAs;
-                    this.store.name = md5(valueToHash);
-                    this.store.load();    
-                }
-                
+                var key;
+                this.xhrArgs = this.xhrArgs || {};
                 this.super();
+
+                if(this.cacheResponse) {
+                    if(this.storageKey) {
+                        key = this.storageKey;
+                    } else {
+                        key = md5(this.args);
+                    }
+
+                    this.store.name = key;
+                    this.store.load();
+                }
             },
             processResponse: function (xhr) {
                 this.super([xhr]);
-                
+
                 if(this.cacheResponse && this.store.name) {
                     this.store.value = this.response;
-                    this.store.save();    
+                    this.store.save();
                 }
             }
         });

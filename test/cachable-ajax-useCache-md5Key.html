@@ -6,7 +6,9 @@
 
   <script src="../../platform/platform.js"></script>
   <link rel="import" href="../../polymer-test-tools/tools.html">
+  <script src="../../../polymer-test-tools/chai/chai.js"></script>
   <script src="../../polymer-test-tools/htmltest.js"></script>
+  <script src="helpers.js"></script>
 
   <!-- Step 1: import the element to test -->
   <link rel="import" href="../cachable-ajax.html">
@@ -14,26 +16,21 @@
 </head>
 <body>
 
-    <cachable-ajax auto url="//gdata.youtube.com/feeds/api/videos/" 
+    <cachable-ajax auto url="//gdata.youtube.com/feeds/api/videos/"
                        params='{"alt":"json", "q":"chrome"}'
                        handleAs="json"></cachable-ajax>
 
   <script>
-      var expected = 2;
+    var expected = 2;
 
-      function checkDone() {
-          expected--;
-          if (expected === 0) {
-              done();
-          }
-      }
-      
+    var checkDone = TestHelpers.expectNCalls(expected, done);
+
     document.addEventListener('polymer-ready', function() {
       var myEl = document.querySelector('cachable-ajax');
       assert.equal(myEl.cacheResponse, true);
 
       // Test an event
-        myEl.addEventListener('core-response', function(event) {
+        myEl.addEventListener('core-response', function() {
             checkDone();
       });
     });

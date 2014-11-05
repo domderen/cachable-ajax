@@ -22,3 +22,38 @@ before returning the value from server (core-response event callback will fire t
 
 Install the package
 `bower install cachable-ajax --save`
+
+## Usage
+
+Use the following markup on your page
+`<cachable-ajax
+auto
+url="http://gdata.youtube.com/feeds/api/videos/"
+params='{"alt":"json", "q":"chrome"}'
+handleAs="json"
+on-core-response="{{handleResponse}}"
+cacheResponse="true"
+key="localStorageKey"></cachable-ajax>`
+
+## Attributes
+
+*auto* - boolean - If true, automatically performs an Ajax request when either url or params changes. Defaults to false.
+
+*url* - string - The URL target of the request. Defaults to ''.
+
+*params* - string (JSON) - Parameters to send to the specified URL, as JSON. Defaults to ''.
+
+*handleAs* - string - Specifies what data to store in the response property, and to deliver as event.response in response events. Details [here](https://www.polymer-project.org/docs/elements/core-elements.html#core-ajax). Defaults to 'text'.
+
+*cacheResponse* - boolean - Property defining if the ajax response should be cached using the local storage. Defaults to true.
+
+*key* - property defining the key to use in communication with local storage. If the value is falsy, storage key will be generated based on the request parameters. Defaults to undefined.
+
+## Change log
+
+*0.2.1*
+- Added new parameter 'key', for defining custom cache key.
+- Added calculation of generated cache key, based on the xhrArgs object of the request. Basically now component calculated md5 cache of the request.
+*0.1.1*
+- Added basic version of the component, being able to cache responses to localstorage.
+
