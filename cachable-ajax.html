@@ -107,6 +107,7 @@ key="localStorageKey"></cachable-ajax>
           // This is equivalent with 'this.super()', but for some reason, the proper version
           // does not want to work here. Probably some internal Polymer issue?
           that.__proto__.__proto__.go.call(that);
+          // https://github.com/Polymer/polymer/issues/898
 
           if (that.cacheResponse) {
             if (that.storageKey) {
