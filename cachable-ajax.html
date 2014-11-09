@@ -3,6 +3,7 @@
 <link rel="import" href="../core-localstorage/core-localstorage.html">
 
 <script src="../js-md5/js/md5.min.js"></script>
+<script src="../es6-promise-polyfill/promise.min.js"></script>
 
 <!--
 This element extends core-ajax element. It exposes the same API (docs: https://www.polymer-project.org/docs/elements/core-elements.html#core-ajax).
@@ -35,90 +36,114 @@ key="localStorageKey"></cachable-ajax>
 @homepage http://domderen.github.io/cachable-ajax
 -->
 <polymer-element name="cachable-ajax" hidden extends="core-ajax" attributes="cacheResponse">
-    <script>
+  <script>
+    (function () {
+      'use strict';
 
-        Polymer({
-            /**
-             * Fired when a response is received. In cached content is found, this event will be fired twice.
-             *
-             * @event cachable-response
-             */
+      var store = document.createElement('core-localstorage');
 
-            /**
-             * Fired when an error is received.
-             *
-             * @event core-error
-             */
+      Polymer({
+        /**
+         * Fired when a response is received. In cached content is found, this event will be fired twice.
+         *
+         * @event cachable-response
+         */
 
-            /**
-             * Fired whenever a response or an error is received.
-             *
-             * @event core-complete
-             */
+        /**
+         * Fired when an error is received.
+         *
+         * @event core-error
+         */
 
-            /**
-           * `cacheResponse` is a property defining if the ajax response should be cached using the local storage.
-           *
-           * @property cacheResponse
-           * @type bool
-           * @default true
-           */
-            cacheResponse: true,
+        /**
+         * Fired whenever a response or an error is received.
+         *
+         * @event core-complete
+         */
 
-            /**
-           * `storageKey` is a property defining the key to use in communication with local storage.
-           * If the value is falsy, storage key will be generated based on the request parameters.
-           *
-           * @property storageKey
-           * @type string
-           * @default undefined
-           */
-            storageKey: undefined,
+        /**
+         * `cacheResponse` is a property defining if the ajax response should be cached using the local storage.
+         *
+         * @property cacheResponse
+         * @type bool
+         * @default true
+         */
+        cacheResponse: true,
 
-            ready: function() {
-                var that = this;
+        /**
+         * `storageKey` is a property defining the key to use in communication with local storage.
+         * If the value is falsy, storage key will be generated based on the request parameters.
+         *
+         * @property storageKey
+         * @type string
+         * @default undefined
+         */
+        storageKey: undefined,
 
-                this.super();
-                this.store = document.createElement('core-localstorage');
-                this.store.useRaw = false;
-                this.store.autoSaveDisabled = true;
-                this.store.addEventListener('core-localstorage-load', function () {
-                    that.fire('core-response', {response: that.store.value});
-                });
-            },
+        ready: function () {
+          var that = this;
 
-            /**
-             * Performs an Ajax request to the specified URL. If cacheResponse is set to true,
-             * it also tries to load the value for this request from the localstorage.
-             *
-             * @method go
-             */
-            go: function () {
-                var key;
-                this.xhrArgs = this.xhrArgs || {};
-                this.super();
+          this.super();
+          store = document.createElement('core-localstorage');
+          store.useRaw = false;
+          store.autoSaveDisabled = true;
+          store.addEventListener('core-localstorage-load', function () {
+            that.fire('core-response', {response: that.store.value});
+          });
+        },
 
-                if(this.cacheResponse) {
-                    if(this.storageKey) {
-                        key = this.storageKey;
-                    } else {
-                        key = md5(this.args);
-                    }
+        /**
+         * Performs an Ajax request to the specified URL. If cacheResponse is set to true,
+         * it also tries to load the value for this request from the localstorage.
+         *
+         * @method go
+         */
+        go: function () {
+          this.requestPromise = new Promise(function (resolve, reject) {
+            this.resolveRequestPromise = resolve;
+            this.rejectRequestPromise = reject;
 
-                    this.store.name = key;
-                    this.store.load();
-                }
-            },
-            processResponse: function (xhr) {
-                this.super([xhr]);
+            var key;
+            this.xhrArgs = this.xhrArgs || {};
+            this.super();
 
-                if(this.cacheResponse && this.store.name) {
-                    this.store.value = this.response;
-                    this.store.save();
-                }
+            if (this.cacheResponse) {
+              if (this.storageKey) {
+                key = this.storageKey;
+              } else {
+                key = md5(this.args);
+              }
+
+              store.name = key;
+              store.load();
             }
-        });
+          });
 
-    </script>
+          return this.requestPromise;
+        },
+        processError: function (xhr) {
+          this.super([xhr]);
+
+          if(this.rejectRequestPromise) {
+            this.rejectRequestPromise(this.error);
+          }
+
+        },
+        processResponse: function (xhr) {
+          this.super([xhr]);
+
+          if (this.cacheResponse && this.store.name) {
+            store.value = this.response;
+            store.save();
+          }
+
+          if(this.resolveRequestPromise) {
+            this.resolveRequestPromise(this.response);
+          }
+        }
+      });
+    })();
+
+  </script>
 
 </polymer-element>
