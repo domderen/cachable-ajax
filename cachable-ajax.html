@@ -97,6 +97,7 @@ key="localStorageKey"></cachable-ajax>
          * it also tries to load the value for this request from the localstorage.
          *
          * @method go
+         * @returns (Promise) A promise object that will be resolved with the server response.
          */
         go: function () {
           return new Promise(function (resolve, reject) {

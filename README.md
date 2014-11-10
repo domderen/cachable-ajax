@@ -49,7 +49,15 @@ key="localStorageKey"></cachable-ajax>`
 
 *key* - property defining the key to use in communication with local storage. If the value is falsy, storage key will be generated based on the request parameters. Defaults to undefined.
 
+## Methods
+
+*go* - Method which performs the server request. Returns promise which will be resolved when the server response will come.
+
 ## Change log
+
+*0.3.1*
+- Added promise response from the 'go' method. Now this component can be easily used as a service for http requests, from other components.
+- Refactored unnecessary public properties to private fields, for cleaner component API.
 
 *0.2.1*
 - Added new parameter 'key', for defining custom cache key.
