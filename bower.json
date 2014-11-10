@@ -11,7 +11,7 @@
   ],
   "main": "cachable-ajax.html",
   "dependencies": {
-    "polymer": "Polymer/polymer#^0.4.0",
+    "polymer": "Polymer/polymer#^0.4.2",
     "core-ajax": "Polymer/core-ajax#~0.4.2",
     "core-localstorage": "Polymer/core-localstorage#~0.4.2",
     "js-md5": "~1.1.0"
