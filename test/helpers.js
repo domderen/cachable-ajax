@@ -1,31 +1,25 @@
 (function (window) {
     'use strict';
 
-    function TestHelpers () {
-        var self = this;
+  function Plan(count, done) {
+    this.done = done;
+    this.count = count;
+  }
 
-        self.checkDone = function () {
+  Plan.prototype.ok = function (expression) {
+    assert(expression);
 
-        };
-
-        self.expectNCalls = function (n, done) {
-            var expected = n;
-
-            return function () {
-                expected--;
-                if (expected === 0) {
-                    setTimeout(function () {
-                        if(expected === 0) {
-                            done();
-                        } else {
-                            assert.fail("Expected out of range!");
-                        }
-                    }, 100);
-                }
-            };
-        }
+    if (this.count === 0) {
+      assert(false, 'Too many assertions called');
+    } else {
+      this.count--;
     }
 
-    window.TestHelpers = new TestHelpers();
+    if (this.count === 0) {
+      this.done();
+    }
+  };
+
+  window.Plan = Plan;
 })(window);
 

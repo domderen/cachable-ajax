@@ -4,15 +4,12 @@
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
   <title>cachable-ajax</title>
 
-  <script src="../../platform/platform.js"></script>
-  <link rel="import" href="../../polymer-test-tools/tools.html">
-  <script src="../../../polymer-test-tools/chai/chai.js"></script>
-  <script src="../../polymer-test-tools/htmltest.js"></script>
+  <script src="../../webcomponentsjs/webcomponents.min.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
   <script src="helpers.js"></script>
 
   <!-- Step 1: import the element to test -->
   <link rel="import" href="../cachable-ajax.html">
-
 </head>
 <body>
 
@@ -20,22 +17,23 @@
                        params='{"alt":"json", "q":"chrome"}'
                        handleAs="json"></cachable-ajax>
 
-  <script>
-    var expected = 2;
-
-    var checkDone = TestHelpers.expectNCalls(expected, done);
-
-    document.addEventListener('polymer-ready', function() {
+    <script>
       var myEl = document.querySelector('cachable-ajax');
-      assert.equal(myEl.cacheResponse, true);
 
-      // Test an event
-        myEl.addEventListener('core-response', function() {
-            checkDone();
+      suite('<cachable-ajax auto url="//gdata.youtube.com/feeds/api/videos/" params=\'{"alt":"json", "q":"chrome"}\' handleAs="json"', function () {
+
+        test('expect cacheResponse set to true', function () {
+          assert.equal(myEl.cacheResponse, true);
+        });
+
+        test('expect core-response to fire on load', function (done) {
+          var plan = new Plan(3, done);
+
+          myEl.addEventListener('core-response', function () {
+            plan.ok(true);
+          });
+        });
       });
-    });
-
-  </script>
-
+    </script>
 </body>
 </html>
