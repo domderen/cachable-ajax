@@ -29,6 +29,7 @@ params='{"alt":"json", "q":"chrome"}'
 handleAs="json"
 on-core-response="{{handleResponse}}"
 cacheResponse="true"
+cacheTTL="3600"
 key="localStorageKey"></cachable-ajax>
 
 @element cachable-ajax
@@ -72,6 +73,15 @@ key="localStorageKey"></cachable-ajax>
         cacheResponse: true,
 
         /**
+         * `cacheTTL` is a property defining after how many seconds the cache entry should be invalidated.
+         *
+         * @property cacheTTL
+         * @type int
+         * @default Number.MAX_VALUE
+         */
+        cacheTTL: Number.MAX_VALUE,
+
+        /**
          * `storageKey` is a property defining the key to use in communication with local storage.
          * If the value is falsy, storage key will be generated based on the request parameters.
          *
@@ -88,7 +98,11 @@ key="localStorageKey"></cachable-ajax>
           store.useRaw = false;
           store.autoSaveDisabled = true;
           store.addEventListener('core-localstorage-load', function () {
-            self.fire('core-response', {response: store.value});
+            if (store.value.expire > Date.now()) {
+              self.fire('core-response', {
+                response: store.value.data
+              });
+            }
           });
         },
 
@@ -137,7 +151,10 @@ key="localStorageKey"></cachable-ajax>
           self.super([xhr]);
 
           if (self.cacheResponse && store.name) {
-            store.value = self.response;
+            store.value = {
+              expire: Date.now() + self.cacheTTL,
+              data: self.response
+            };
             store.save();
           }
 
